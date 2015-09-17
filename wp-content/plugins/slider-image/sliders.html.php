@@ -1116,7 +1116,7 @@ function html_popup_video(){
 							</div>
 						</div>
 						<div class="error-message">
-							Please insert link only from youtobe or vimeo
+							Please insert link only from youtube or vimeo
 						</div>
 					</div>
 				

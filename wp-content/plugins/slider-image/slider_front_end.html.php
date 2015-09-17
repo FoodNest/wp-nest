@@ -3,7 +3,7 @@
 function front_end_slider($images, $paramssld, $slider)
 {
  ob_start();
-// if(isset($slider)) {
+ if(isset($slider)) {
 	$sliderID=$slider[0]->id;
 	$slidertitle=$slider[0]->name;
 	$sliderheight=$slider[0]->sl_height;
@@ -14,10 +14,11 @@ function front_end_slider($images, $paramssld, $slider)
 	$sliderposition=$slider[0]->sl_position;
 	$slidechangespeed=$slider[0]->param;
 	$sliderloadingicon=$slider[0]->sl_loading_icon;
-	
+	$sliderthumbslider=$slider[0]->show_thumb;
+
 	$slideshow_title_position = explode('-', trim($paramssld['slider_title_position']));
 	$slideshow_description_position = explode('-', trim($paramssld['slider_description_position']));
-// }
+ }
 	$hasyoutube=false;
 	$hasvimeo=false;
 	foreach ($images as $key => $image_row) {
@@ -203,7 +204,9 @@ jQuery(function(){
 	
 	
 <script>
+
 	jQuery(document).ready(function($) {
+
   $('.thumb_wrapper').on('click', function(ev) {
   	var hugeid=$(this).data('rowid');
   	var myid=hugeid;
@@ -213,6 +216,11 @@ jQuery(function(){
  
   });
 });
+
+	if(typeof sliderID_array =="undefined"){
+		var sliderID_array=[];
+	}
+	
 	var data_<?php echo $sliderID; ?> = [];      
 	var event_stack_<?php echo $sliderID; ?> = [];
 	huge_video_playing['video_is_playing_'+<?php echo $sliderID; ?>]=false;
@@ -342,9 +350,27 @@ jQuery(function(){
       var huge_it_trans_in_progress_<?php echo $sliderID; ?> = false;
       var huge_it_transition_duration_<?php echo $sliderID; ?> = <?php echo $slidechangespeed;?>;
       var huge_interval ={};
+      var id_array_index=sliderID_array.length
+
+	  <?php 
+	  		$huge_sliderId='';
+	  		if(isset($huge_sliderId)){
+	  		$huge_sliderId=$huge_sliderId;
+		  	}else{
+		  		$huge_sliderId='';
+		  	}
+		  	if($huge_sliderId==';'){
+		  		$huge_sliderId='';
+		  	}
+	  if($slider[0]->show_thumb =='thumbnails'){
+	  		$huge_sliderId=$slider[0]->id;
+	  	}
+	  
+	  	?>
+
       
-      var sliderID = <?php echo $sliderID; ?>;
-   
+	  var ifhasthumb ="<?php echo $sliderthumbslider; ?>";
+	  sliderID_array[id_array_index] = <?php echo $huge_sliderId; ?>
       // Stop autoplay.
       window.clearInterval(huge_interval['huge_it_playInterval_'+<?php echo $sliderID; ?>]);
 	  
@@ -780,7 +806,7 @@ jQuery(function(){
 				stopYoutubeVideo();
 			<?php } } ?>
 			window.clearInterval(huge_interval['huge_it_playInterval_'+<?php echo $sliderID; ?>]);
-			huge_play['function play_'+<?php echo $sliderID; ?>]();
+			play_<?php echo $sliderID; ?>();
         }
 
       }
@@ -868,17 +894,7 @@ jQuery(function(){
 			huge_it_change_image_<?php echo $sliderID; ?>(parseInt(jQuery('#huge_it_current_image_key_<?php echo $sliderID; ?>').val()), (parseInt(jQuery('#huge_it_current_image_key_<?php echo $sliderID; ?>').val()) + iterator_<?php echo $sliderID; ?>()) % data_<?php echo $sliderID; ?>.length, data_<?php echo $sliderID; ?>,false,true);
 			return false;
 		});
-		jQuery(".huge_it_slideshow_thumbs_container_"+sliderID).find("a[class='bx-next']").on('click',function(){
-  	  		huge_it_change_image_<?php echo $sliderID; ?>(parseInt(jQuery('#huge_it_current_image_key_<?php echo $sliderID; ?>').val()), (parseInt(jQuery('#huge_it_current_image_key_<?php echo $sliderID; ?>').val()) + iterator_<?php echo $sliderID; ?>()) % data_<?php echo $sliderID; ?>.length, data_<?php echo $sliderID; ?>,false,true);
-			//return false;
-            window.clearInterval(huge_interval['huge_it_playInterval_'+sliderID]);
-				
-	  	  })
-		jQuery(".huge_it_slideshow_thumbs_container_"+sliderID).find("a[class='bx-prev']").on('click',function(){
-  	  		huge_it_change_image_<?php echo $sliderID; ?>(parseInt(jQuery('#huge_it_current_image_key_<?php echo $sliderID; ?>').val()), (parseInt(jQuery('#huge_it_current_image_key_<?php echo $sliderID; ?>').val()) - iterator_<?php echo $sliderID; ?>()) >= 0 ? (parseInt(jQuery('#huge_it_current_image_key_<?php echo $sliderID; ?>').val()) - iterator_<?php echo $sliderID; ?>()) % data_<?php echo $sliderID; ?>.length : data_<?php echo $sliderID; ?>.length - 1, data_<?php echo $sliderID; ?>,false,true);
-			//return false;
-			window.clearInterval(huge_interval['huge_it_playInterval_'+sliderID]);
-	  	  })
+	
 
 		
 	
@@ -904,14 +920,14 @@ jQuery(function(){
 				window.clearInterval(huge_interval['huge_it_playInterval_'+<?php echo $sliderID; ?>]);
 			},function(){
 				window.clearInterval(huge_interval['huge_it_playInterval_'+<?php echo $sliderID; ?>]);
-				huge_play['function play_'+<?php echo $sliderID; ?>]();
+				play_<?php echo $sliderID; ?>();
 			});		
 		}	
-          huge_play['function play_'+<?php echo $sliderID; ?>]();        
+          play_<?php echo $sliderID; ?>();        
       });
-		var huge_play={};
+		//var huge_play={};
 
-      huge_play['function play_'+<?php echo $sliderID; ?>]= function(){	   
+      function play_<?php echo $sliderID; ?>(){	   
         /* Play.*/
 		//errorlogjQuery(".huge_it_slideshow_image_wrap_<?php echo $sliderID; ?>").after(" -- paly  ---- ");
         huge_interval['huge_it_playInterval_'+<?php echo $sliderID; ?>] = setInterval(function () {
@@ -1272,8 +1288,9 @@ jQuery(document).ready(function($) {
 
 	
 </div>
+<?php if($sliderthumbslider=='thumbnails'){?>
 <div class="huge_it_slideshow_thumbs_container_<?php echo $sliderID; ?>">
-			  <ul id="huge_it_thumb_slider"class="huge_it_slideshow_thumbs_<?php echo $sliderID; ?>">
+			  <ul id="huge_it_thumb_slider" class="huge_it_slideshow_thumbs_<?php echo $sliderID; ?>">
 				<?php
 				$i=0;
 				$current_image_id=0;
@@ -1419,7 +1436,7 @@ jQuery(document).ready(function($) {
 			  </ul>
 
 	</div>	
-
+<?php } ?>
 
 
 	  <?php 
